@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /universe-notes
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+# security-lab/ is intentionally excluded from version updates, and Dependabot
+# security updates are off. Its alerts stay open so they can be assigned to
+# Copilot during demos.
