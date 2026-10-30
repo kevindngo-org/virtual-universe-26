@@ -31,3 +31,23 @@ These are real findings in the workshop code, not seeded fixtures.
 Alerts come from `security-lab/dependencies/package-lock.json` (`jsonwebtoken 8.5.1`, `lodash 4.17.20`, `marked 0.3.6`, `minimist 1.2.5`): [Security → Dependabot](https://github.com/kevindngo-org/virtual-universe-26/security/dependabot). Assign the `jsonwebtoken` alert to Copilot: the fix needs v9 plus a code change (explicit `algorithms`).
 
 Dependabot security updates are intentionally off so alerts stay open.
+
+## Resetting remote state after an event
+
+Requires Node.js 20+ and the authenticated GitHub CLI (`gh`) with repository write access and permission to read/update code scanning and Dependabot alerts. The command is locked to `kevindngo-org/virtual-universe-26`; it never targets the upstream event repository.
+
+```sh
+node demo/remote-reset.mjs           # Preview remote changes (default, read-only)
+node demo/remote-reset.mjs --confirm # Apply, then verify remote state
+node demo/remote-reset.mjs --record  # Replace the baseline after intentional changes
+```
+
+The baseline is `demo/demo-state.json` plus the remote `demo-baseline` tag. Reset force-moves `main` and recorded branches to their baseline commits (including undoing merged dark-mode/security fixes), closes all post-baseline PRs, and deletes all post-baseline branches. Use this only in this dedicated demo repository: unrelated new branches/PRs are not exempt. It never deletes seeded branches, enables Dependabot security updates, changes repository settings, or modifies local worktrees.
+
+Seeded issues are reopened and their assignees restored. Seeded PRs are reopened if possible, or recreated with their recorded title, body, draft status, and labels if merged or no longer reopenable. Recreated PRs receive new numbers; update presentation bookmarks accordingly. Dismissed code scanning and Dependabot alerts are reopened and alert assignees cleared. Fixed alerts cannot be reopened through the API: they return after CodeQL/Dependabot rescan the restored vulnerable code. Alert availability and timing depend on the scanners, not this script.
+
+**Before applying:** stop active Copilot sessions, Agent merge, and any other branch writers. Preview the full plan. Protected branches or insufficient security permissions fail explicitly; the command stops on the first failure and a subsequent preview shows remaining work. Each changed/deleted ref is checked for concurrent changes before mutation, but this is not a transaction. Reviews, comments, CI runs, and agent timelines remain. Newly created issues are not deleted.
+
+**Recording intentional changes:** first land the reset script and any desired permanent changes on remote `main`. In a clean checkout whose `HEAD` equals remote `main`, run `--record`. It captures all current open PRs, open issues/assignees, and non-main branch heads; commits/pushes only the baseline file to this fork's `main`; then moves the remote lightweight `demo-baseline` tag to that commit, so the reset command itself survives a reset. Do not record in the middle of a demo, or temporary work will become part of the baseline. Recording does not reopen alerts or clear assignments.
+
+After resetting, refresh your local checkout using your normal safe Git workflow. Save uncommitted work first; the reset command deliberately does not discard it.

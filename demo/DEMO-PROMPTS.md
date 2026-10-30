@@ -136,6 +136,13 @@ Return to the Copilot app and show the dark-mode PR with its review status. *"On
 
 ## After the demo
 
-- Close demo-created PRs and delete their branches; unassign Copilot from issue #6.
-- Reopen any dismissed alerts. Fixed code scanning alerts reopen only if you revert the fix on `main`.
-- Leave PRs #7 to #9 and issues #1 to #6 open for the next run.
+Stop running Copilot cloud-agent sessions, Agent merge, and any other branch writers first, then run from the checkout:
+
+```sh
+node demo/remote-reset.mjs           # Preview; no changes
+node demo/remote-reset.mjs --confirm # Apply the destructive remote reset
+```
+
+This restores `main`, the prepared PR heads, and issue assignees to the recorded baseline; closes post-baseline PRs and deletes their branches; and reopens dismissed alerts. Seeded PRs #7 to #9 are reopened (or recreated with new numbers if merged), and issues #1 to #6 are reopened and unassigned. Fixed alerts return after the scanners rescan restored `main`.
+
+Local worktrees, review comments, and agent history are not erased. See [reset details and baseline recording](DEMO-LINKS.md#resetting-remote-state-after-an-event) before making permanent changes.
