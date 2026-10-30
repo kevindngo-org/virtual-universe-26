@@ -136,8 +136,8 @@ its content API. Do not push, open PRs, comment, or change alerts.
 
 1. Run `node demo/remote-reset.mjs` (preview only, never --confirm) and
    report any drift from the demo baseline.
-2. Run `npm test`. Report failures, noting the four known welcome-guide
-   failures separately from new ones.
+2. Run `node --test tests/*.test.mjs`. Report failures, noting the four
+   known welcome-guide failures separately from new ones.
 3. Serve docs/ locally and confirm docs/index.html loads with no console
    errors.
 4. With gh, confirm kevindngo-org/universe-content-api `main` still
