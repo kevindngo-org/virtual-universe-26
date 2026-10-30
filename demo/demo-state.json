@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "repo": "kevindngo-org/virtual-universe-26",
+  "branches": {
+    "copilot/landing-page-smoke-tests": "0e909dc3f8067f278a3ce2602552e05c300fe8d4",
+    "feature/keynote-highlights": "cc438ae584f279918ae1a84f88b2120518c82df7",
+    "feature/terminal-copy-button": "4fdb47f197bcaa1d3d34f19cfbeb63e2ed0cf077"
+  },
+  "prs": [
+    {
+      "number": 9,
+      "head": "copilot/landing-page-smoke-tests",
+      "base": "main",
+      "title": "Add Playwright smoke tests for the landing page",
+      "body": "Work in progress for #5.\n\n## What changed\n- Adds `@playwright/test` config that serves `docs/` on port 8000.\n- First two smoke tests: arrow-key tab navigation and reduced-motion rendering.\n\n## Remaining\n- [ ] Pause/Play, Home/End, and guide-to-chat tests\n- [ ] Add a `package.json` with `@playwright/test` and a `test:e2e` script\n- [ ] Document the command in the README\n",
+      "draft": true,
+      "labels": [
+        "testing",
+        "frontend"
+      ]
+    },
+    {
+      "number": 8,
+      "head": "feature/keynote-highlights",
+      "base": "main",
+      "title": "Render keynote highlights with a topic filter",
+      "body": "Closes #3\n\n## What changed\n- New \"Keynote highlights\" section above the keynote call to action.\n- Loads `universe-notes/notes/keynote-highlights.json` and renders each highlight's title, summary, and \"Try it\" text.\n- Topic filter buttons (\"All\" plus each topic) narrow the list.\n\n## How I verified it\n- Opened the page from the repository root with a local static server and clicked through each topic filter.\n\n## Checklist\n- [x] Matches existing visual language\n- [ ] Tests for the filter logic\n",
+      "draft": false,
+      "labels": [
+        "enhancement",
+        "demo:code-review",
+        "frontend"
+      ]
+    },
+    {
+      "number": 7,
+      "head": "feature/terminal-copy-button",
+      "base": "main",
+      "title": "Add a Copy button to the CLI terminal demo",
+      "body": "Closes #2\n\n## What changed\n- Added a **Copy** button next to Pause and Replay in the terminal bar.\n- Clicking it copies the terminal example to the clipboard and shows \"Copied\" for two seconds.\n\n## How I verified it\n- Served `docs/` with `python3 -m http.server 8000 --directory docs`.\n- Clicked **Copy** on the Stacked PRs tab and pasted into a text editor.\n\n## Checklist\n- [x] Keyboard reachable\n- [ ] Screen reader announcement\n- [ ] Tests\n",
+      "draft": false,
+      "labels": [
+        "enhancement",
+        "demo:code-review",
+        "frontend"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "number": 6,
+      "assignees": []
+    },
+    {
+      "number": 5,
+      "assignees": []
+    },
+    {
+      "number": 4,
+      "assignees": []
+    },
+    {
+      "number": 3,
+      "assignees": []
+    },
+    {
+      "number": 2,
+      "assignees": []
+    },
+    {
+      "number": 1,
+      "assignees": []
+    }
+  ]
+}
