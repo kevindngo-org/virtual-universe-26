@@ -1,0 +1,1 @@
+Synthetic fixture for remote reset verification; safe to remove.
