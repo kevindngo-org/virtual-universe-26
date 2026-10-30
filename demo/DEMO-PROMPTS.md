@@ -11,6 +11,7 @@ Prepared PRs, issues, and alerts are listed in [DEMO-LINKS.md](DEMO-LINKS.md).
 | 5–10 min | Copilot app + browser canvas | Implement, then inspect the page live |
 | 10–12 min | Copilot app + browser canvas | Refine in the browser, open the PR |
 | +6 min (optional) | Copilot app + browser canvas | Act 1b: multi-repo topic filters (landing page + content API) |
+| +3 min (optional) | Copilot app → Automations | Act 1c: schedule a weekly readiness check |
 | 12–16 min | GitHub.com | Copilot code review on PR #8 |
 | 16–19 min | GitHub.com | Assign issue #6 to Copilot cloud agent |
 | 19–23 min | GitHub.com | Code scanning alert → agentic autofix |
@@ -114,6 +115,48 @@ Show the Overview tab with both sessions, then the browser canvas filtering by t
 
 ---
 
+## Act 1c · Schedule an automation (optional, +3 min)
+
+**Story:** "Everything so far started because I asked. This landing page and API ship to the event, and this demo resets between runs, so some checks should run without me. I'll schedule a weekly readiness check."
+
+Click through: **Automations** → **New automation**.
+
+| Field | Value |
+| --- | --- |
+| Name | `Universe readiness check` |
+| Repository | `kevindngo-org/virtual-universe-26` |
+| Schedule | Weekly, Monday 8:00 |
+| Mode | Autopilot (the prompt is read-only) |
+
+Prompt:
+
+```text
+Run a read-only readiness check for the Universe '26 landing page and
+its content API. Do not push, open PRs, comment, or change alerts.
+
+1. Run `node demo/remote-reset.mjs` (preview only, never --confirm) and
+   report any drift from the demo baseline.
+2. Run `npm test`. Report failures, noting the four known welcome-guide
+   failures separately from new ones.
+3. Serve docs/ locally and confirm docs/index.html loads with no console
+   errors.
+4. With gh, confirm kevindngo-org/universe-content-api `main` still
+   matches its `demo-baseline` tag and issues #1–#4 are open.
+5. List new Dependabot or code scanning alerts and new PRs opened in
+   either repository in the last 7 days.
+
+Finish with a short status: Ready, or Needs attention with what to fix
+and the command to fix it.
+```
+
+Click **Run now** so the audience sees a run start in a fresh session, then show a finished run if you have one.
+
+*Talk track:* "Each run gets a fresh session with the repo's instructions, does the boring check, and hands me one line: ready or not. It's read-only, so it can't break the demo it's protecting. I review the result; it doesn't fix things on its own."
+
+Daily alternative: name it `Universe security digest`, schedule it daily at 8:00, and ask it to summarize new Dependabot and code scanning alerts and new PRs from the last 24 hours across both repositories, ranked by severity with a suggested next action for each, again read-only.
+
+---
+
 ## Act 2 · GitHub.com (12–24 min)
 
 ### Stop A · Copilot code review (12–16 min)
@@ -174,5 +217,7 @@ node demo/remote-reset.mjs --confirm # Apply the destructive remote reset
 If you ran Act 1b, run the same two commands from a `kevindngo-org/universe-content-api` checkout too. Each repo's command only changes its own repository.
 
 This restores `main`, the prepared PR heads, and issue assignees to the recorded baseline; closes post-baseline PRs and deletes their branches; and reopens dismissed alerts. Seeded PRs #7 to #9 are reopened (or recreated with new numbers if merged), and issues #1 to #6 are reopened and unassigned. Fixed alerts return after the scanners rescan restored `main`.
+
+If you ran Act 1c, turn off the automation's switch in **Automations** or delete it there. The reset command doesn't touch automations, because they live in the app, not the repository.
 
 Local worktrees, review comments, and agent history are not erased. See [reset details and baseline recording](DEMO-LINKS.md#resetting-remote-state-after-an-event) before making permanent changes.
