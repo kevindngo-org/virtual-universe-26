@@ -121,6 +121,14 @@
       h2 { font-size: 23px; }
       .intro { padding-block: 16px; }
     }
+    .highlights { max-width: var(--content-width); margin: 40px auto 0; padding: 0 24px; }
+    .topic-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+    .topic-filters button { border: 1px solid var(--line); background: var(--field); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+    .topic-filters button.active { background: var(--ink); color: #fff; }
+    .highlight-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; padding: 0; list-style: none; }
+    .highlight-list li { border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .highlight-list h3 { margin: 0 0 8px; font-size: 16px; }
+    .highlight-list code { font-size: 12px; }
   </style>
 </head>
 <body>
@@ -203,6 +211,11 @@
           </div>
         </section>
       </div>
+      <section class="highlights" aria-labelledby="highlights-heading">
+        <h2 id="highlights-heading">Keynote highlights</h2>
+        <div class="topic-filters" id="topic-filters"></div>
+        <ul class="highlight-list" id="highlight-list"></ul>
+      </section>
       <section class="keynote-cta" aria-labelledby="keynote-heading">
         <h2 id="keynote-heading">Catch up on the keynote highlights</h2>
         <p class="description">Explore the biggest announcements from GitHub Universe and see what's next.</p>
@@ -330,6 +343,28 @@ without leaving the terminal.</span>` }
       stepList.hidden = false;
       stepList.replaceChildren(...messages[index][2].map(step => Object.assign(document.createElement('li'), { textContent: step })));
     }));
+    const filterBar = document.getElementById('topic-filters');
+    const highlightList = document.getElementById('highlight-list');
+    function renderHighlights(highlights, topic) {
+      const visible = topic === 'All' ? highlights : highlights.filter(item => item.topic === topic);
+      highlightList.innerHTML = visible.map(item => `<li><h3>${item.title}</h3><p>${item.summary}</p><code>${item.tryIt}</code></li>`).join('');
+    }
+    fetch('../universe-notes/notes/keynote-highlights.json')
+      .then(response => response.json())
+      .then(({ highlights }) => {
+        const topics = ['All', ...new Set(highlights.map(item => item.topic))];
+        topics.forEach(topic => {
+          const button = Object.assign(document.createElement('button'), { textContent: topic });
+          button.addEventListener('click', () => {
+            filterBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            renderHighlights(highlights, topic);
+          });
+          filterBar.append(button);
+        });
+        filterBar.firstChild.classList.add('active');
+        renderHighlights(highlights, 'All');
+      });
   </script>
 </body>
 </html>
