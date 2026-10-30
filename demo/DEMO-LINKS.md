@@ -19,6 +19,15 @@ Prepared backlog for showing Copilot cloud agent, Copilot code review, and Depen
 | [#5 Add browser smoke tests](https://github.com/kevindngo-org/virtual-universe-26/issues/5) → [draft PR #9](https://github.com/kevindngo-org/virtual-universe-26/pull/9) | In-progress example to continue |
 | [#2 Copy button](https://github.com/kevindngo-org/virtual-universe-26/issues/2), [#3 Keynote highlights](https://github.com/kevindngo-org/virtual-universe-26/issues/3) | Linked to the review PRs |
 
+## Multi-repo (label `multi-repo`)
+| Issue | Use |
+| --- | --- |
+| [#11 Load keynote highlights from the content API with topic filters](https://github.com/kevindngo-org/virtual-universe-26/issues/11) | Frontend half of Act 1b |
+| [universe-content-api#1 Support topic filtering and a topics endpoint](https://github.com/kevindngo-org/universe-content-api/issues/1) | API half of Act 1b |
+| [universe-content-api#2](https://github.com/kevindngo-org/universe-content-api/issues/2), [#3](https://github.com/kevindngo-org/universe-content-api/issues/3), [#4](https://github.com/kevindngo-org/universe-content-api/issues/4) | Spare cloud agent tasks in the API repo |
+
+The API repo has its own `node demo/remote-reset.mjs`; run it separately after Act 1b.
+
 ## Code scanning (CodeQL default setup)
 | Alert | Use |
 | --- | --- |
