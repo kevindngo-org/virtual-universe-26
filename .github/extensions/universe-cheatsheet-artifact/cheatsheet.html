@@ -84,7 +84,7 @@ const btn=()=>document.getElementById('setupbtn');
 function offer(label,fn){const b=btn();b.hidden=false;b.disabled=false;b.classList.remove('sent');b.textContent=label;b.onclick=fn}
 let running=false;
 function done(issue,url){title().textContent='Your issue is ready';
- out().innerHTML='Artifacts will go on <a href="'+url+'">'+issue+'</a>.'}
+ out().textContent='Artifacts will go on '+issue+'.'}
 async function startIssue(){if(running)return;running=true;btn().hidden=true;
  title().textContent='Setting up your issue\u2026';out().textContent='Finding your fork\u2026';
  try{const r=await fetch('start',{method:'POST'});const d=await r.json();
