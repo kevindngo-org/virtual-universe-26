@@ -12,7 +12,7 @@ Prepared PRs, issues, and alerts are listed in [DEMO-LINKS.md](DEMO-LINKS.md).
 | 10–12 min | Copilot app + browser canvas | Refine in the browser, open the PR |
 | +6 min (optional) | Copilot app + browser canvas | Act 1b: multi-repo topic filters (landing page + content API) |
 | +3 min (optional) | Copilot app → Automations | Act 1c: schedule a weekly readiness check |
-| 12–16 min | GitHub.com | Copilot code review on PR #8 |
+| 12–16 min | GitHub.com | Copilot code review on the current keynote-highlights PR |
 | 16–19 min | GitHub.com | Assign issue #6 to Copilot cloud agent |
 | 19–23 min | GitHub.com | Code scanning alert → agentic autofix |
 | 23–24 min | GitHub.com / app | Wrap: Dependabot (optional) and return to the dark-mode PR |
@@ -22,7 +22,7 @@ Prepared PRs, issues, and alerts are listed in [DEMO-LINKS.md](DEMO-LINKS.md).
 - [ ] A Copilot app Project is attached to `kevindngo-org/virtual-universe-26`.
 - [ ] `main` has no dark mode yet (`docs/index.html` still sets `color-scheme: light`).
 - [ ] Open the landing page once: `python3 -m http.server 8000 --directory docs`, then http://localhost:8000.
-- [ ] PRs #7 and #8 are open with no Copilot review yet. Keep one reviewed copy, or a screenshot, as a fallback.
+- [ ] The prepared PRs are open with no Copilot review yet. After a reset, look them up by title because reviewed PRs are replaced with fresh numbers.
 - [ ] Issue #6 is unassigned. Bookmark a completed cloud agent session as a fallback.
 - [ ] Code scanning alert [#1](https://github.com/kevindngo-org/virtual-universe-26/security/code-scanning/1) is open and shows **Assign to Copilot** / **Generate fix**.
 - [ ] Optional: the Dependabot `jsonwebtoken` alert shows the agent assignment control.
@@ -161,7 +161,12 @@ Daily alternative: name it `Universe security digest`, schedule it daily at 8:00
 
 ### Stop A · Copilot code review (12–16 min)
 
-Open [PR #8 Render keynote highlights with a topic filter](https://github.com/kevindngo-org/virtual-universe-26/pull/8) → **Reviewers** → **Copilot**.
+Find the current prepared PR by title (the PR number can change after a reset), then open the returned URL → **Reviewers** → **Copilot**:
+
+```sh
+gh pr list -R kevindngo-org/virtual-universe-26 --state open \
+  --json title,url --jq '.[] | select(.title == "Render keynote highlights with a topic filter") | .url'
+```
 
 Findings planted for discussion (wording varies run to run):
 - `innerHTML` renders note content, which allows markup injection.
@@ -179,7 +184,7 @@ fallback, and add a test for topic filtering. Do not merge.
 
 *Talk track:* "Copilot is a reviewer, not the approver. It catches the security and Pages-path bugs a hurried human misses; a person still decides."
 
-Fallback: [PR #7](https://github.com/kevindngo-org/virtual-universe-26/pull/7) (the copy button copies prompts and output and has no error handling).
+Fallback: find `Add a Copy button to the CLI terminal demo` with the same command, changing the title in the `select(...)` filter (the copy button has no clipboard error handling).
 
 ### Stop B · Copilot cloud agent (16–19 min)
 
@@ -210,13 +215,13 @@ Return to the Copilot app and show the dark-mode PR with its review status. *"On
 Stop running Copilot cloud-agent sessions, Agent merge, and any other branch writers first, then run from the checkout:
 
 ```sh
-node demo/remote-reset.mjs           # Preview; no changes
-node demo/remote-reset.mjs --confirm # Apply the destructive remote reset
+node demo/remote-reset.mjs --preview-json # Read-only plan and fingerprint
+node demo/remote-reset.mjs --confirm --expected-preview 'PASTE_FINGERPRINT_HERE'
 ```
 
-If you ran Act 1b, run the same two commands from a `kevindngo-org/universe-content-api` checkout too. Each repo's command only changes its own repository.
+Copy the `fingerprint` from the JSON output into the second command. A changed plan is rejected before any reset action. If you ran Act 1b, reset that checkout separately using its reset script's preview/confirm instructions. Each repo's command only changes its own repository.
 
-This restores `main`, the prepared PR heads, and issue assignees to the recorded baseline; closes post-baseline PRs and deletes their branches; and reopens dismissed alerts. Seeded PRs #7 to #9 are reopened (or recreated with new numbers if merged), and issues #1 to #6 are reopened and unassigned. Fixed alerts return after the scanners rescan restored `main`.
+This restores `main`, the prepared PR heads, and issue assignees to the recorded baseline; closes post-baseline PRs and deletes their branches; and reopens dismissed alerts. Unreviewed prepared PRs have their title/body, labels, and draft status restored in place when needed. Reviewed prepared PRs are replaced with fresh PRs so the live review demo starts clean; the old PR stays closed with its reviews/comments, and the fresh PR URL is printed. Find the current PR by title using the lookup above. Issues #1 to #6 are reopened and unassigned. Fixed alerts return after the scanners rescan restored `main`.
 
 If you ran Act 1c, turn off the automation's switch in **Automations** or delete it there. The reset command doesn't touch automations, because they live in the app, not the repository.
 
