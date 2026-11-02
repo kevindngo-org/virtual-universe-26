@@ -56,3 +56,19 @@ Learn about:
 2. [GitHub Universe recap page](https://github.com/events/universe/recap/): View all the main announcements, with links to demos and resources.
 
 
+
+## Running the tests
+
+The extension tests use Node's built-in test runner:
+
+```bash
+node --test
+```
+
+The landing page (`docs/index.html`) has Playwright smoke tests in `tests/browser/`. They serve `docs/` on `http://127.0.0.1:8000` (set `DOCS_PORT` to change it) and block every other request, so the only network access needed is the one-time install:
+
+```bash
+npm install
+npx playwright install chromium   # add --with-deps on a fresh Linux machine
+npx playwright test               # or: npm run test:e2e
+```
