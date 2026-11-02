@@ -55,4 +55,25 @@ Learn about:
 1. [Attach a cheat sheet artifact](./github-virtual-universe-highlights/attach-a-cheat-sheet-artifact/): Attach an Artifact to an Issue and download a cheat sheet for everything in this repo. (Also find a ✨super duper secret surprise✨ at the end of this section)
 2. [GitHub Universe recap page](https://github.com/events/universe/recap/): View all the main announcements, with links to demos and resources.
 
+### Preview the API-backed landing page
 
+Start the [content API](https://github.com/kevindngo-org/universe-content-api) on
+port 3001 using its `npm start` command, then serve this checkout directly:
+
+```bash
+python3 -m http.server 8000 --bind localhost --directory docs
+```
+
+Open <http://localhost:8000/#keynote-highlights>. The section loads topic buttons
+from `GET /api/topics` and highlights from `GET /api/highlights`, filtering with
+the URL-encoded topic name. Set `data-api-base` on `#keynote-highlights` in
+`docs/index.html` to use another HTTP(S) API base URL (default:
+`http://localhost:3001`). A remote API must allow the page's origin via CORS;
+an HTTPS page also needs an HTTPS API.
+
+If the API is unavailable or returns invalid data, the page shows a retry action
+and keeps the keynote recap link usable. API content is rendered as text, not
+HTML. With JavaScript disabled, the recap link remains available.
+
+Run the focused dependency-free UI tests with
+`node --test tests/keynote-highlights.test.mjs`.
