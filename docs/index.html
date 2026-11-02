@@ -160,7 +160,7 @@
               <button class="tab" id="tab-pr" role="tab" aria-selected="false" aria-controls="terminal-screen" tabindex="-1" data-example="2">Attach to a PR</button>
             </div>
             <div class="terminal">
-              <div class="terminal-bar"><span id="terminal-title">monas-cafe &mdash; gh stack</span><div class="terminal-controls"><button class="replay" id="pause">Pause</button><button class="replay" id="replay">Replay</button></div></div>
+              <div class="terminal-bar"><span id="terminal-title">monas-cafe &mdash; gh stack</span><div class="terminal-controls"><button class="replay" id="copy">Copy</button><button class="replay" id="pause">Pause</button><button class="replay" id="replay">Replay</button></div></div>
               <pre class="screen" id="terminal-screen" role="tabpanel" aria-labelledby="tab-stack" aria-live="off" tabindex="0"><span class="prompt">monas-cafe &gt; </span>gh stack init fix/price-parser
 <span class="success">&#10003; Started a stack on main</span>
 
@@ -308,6 +308,12 @@ without leaving the terminal.</span>` }
       clearTimeout(timer);
       if (paused) screen.innerHTML = examples[selected].html;
       else animateExample();
+    });
+    const copyButton = document.getElementById('copy');
+    copyButton.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(screen.textContent);
+      copyButton.textContent = 'Copied';
+      setTimeout(() => { copyButton.textContent = 'Copy'; }, 2000);
     });
     function applyMotionPreference() {
       pauseButton.hidden = reducedMotion.matches;
