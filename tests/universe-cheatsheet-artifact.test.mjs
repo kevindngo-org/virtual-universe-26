@@ -68,6 +68,8 @@ test("the guide page points at /cheatsheet-artifact and serves its images", asyn
     try {
         const page = await (await fetch(url)).text();
         assert.match(page, /<pre>\/cheatsheet-artifact<\/pre>/);
+        assert.match(page, /out\(\)\.textContent='Artifacts will go on '\+issue\+'\.'/);
+        assert.doesNotMatch(page, /out\(\)\.innerHTML/);
         // The learner is told the real tool is /create-issue-artifact.
         assert.match(page, /<code>\/create-issue-artifact<\/code>/);
         assert.doesNotMatch(page, /ghapp:/, "the exercise stays in one session");
