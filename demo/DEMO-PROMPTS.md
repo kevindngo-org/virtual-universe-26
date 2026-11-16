@@ -113,6 +113,116 @@ to each other. Do not merge.
 
 Show the Overview tab with both sessions, then the browser canvas filtering by topic. If the frontend session starts before the contract is ready, steer it live: that's the point of a coordinator. Details: [universe-content-api demo/DEMO.md](https://github.com/kevindngo-org/universe-content-api/blob/main/demo/DEMO.md).
 
+### Three-session demo prompt
+
+```text
+Build an interactive keynote highlights experience across
+kevindngo-org/virtual-universe-26 and kevindngo-org/universe-content-api,
+following website issue #11 and API issue #1. In parallel, delegate a
+separate API smoke-test task to a cloud coding session.
+
+First, check local ports 8000 and 3001. If either is in use, stop and
+tell me. Do not terminate or reuse another service, or silently change
+ports.
+
+Start exactly three new coding sessions:
+
+1. LOCAL — Website: implement the keynote highlights UI in
+   kevindngo-org/virtual-universe-26.
+2. LOCAL — API: implement topic filtering and the topics endpoint in
+   kevindngo-org/universe-content-api.
+3. CLOUD — API smoke test: build and exercise an independent API
+   verification tool in kevindngo-org/universe-content-api, running
+   in a GitHub-hosted cloud sandbox—not another local session or a
+   background subagent.
+
+Confirm each session's repository and actual execution location using
+app/session metadata. Do not infer that a cloud sandbox is unavailable
+solely because GITHUB_ACTIONS or CODESPACES is unset. If cloud execution
+is unavailable, report the blocker before editing; do not silently
+substitute a local session.
+
+Use a fresh, uniquely named branch for every session, based on its
+repository's current main. Implement from the issues and main—not
+earlier demo or practice branches or PRs. Do not reopen, modify, or
+copy code from existing or prepared PRs. Keep all three branches
+independent; do not stack or cherry-pick between them.
+
+Begin with read-only preparation. Agree the API contract early and
+relay it between the two local sessions. Start the frontend server
+and display the baseline in the existing browser canvas before ANY
+of the three sessions edits files. After confirming that baseline,
+release all three sessions to work in parallel.
+
+LOCAL WEBSITE AND API TASKS
+
+Let frontend layout work proceed alongside API implementation, then
+integrate against the tested API.
+
+Use the existing six sample highlights. Give the section compact
+cards, API-backed topic buttons, a clear selected state, and a visible
+result count. Preserve the page's existing visual language and meet
+both issues' accessibility, safe rendering, and API-failure
+requirements.
+
+Run the API on port 3001 from the local API session's checkout. Serve
+docs/ directly from the local frontend session's checkout on port
+8000—not from an exported snapshot. Verify both servers are using
+the correct checkouts.
+
+Navigate the existing browser canvas to http://127.0.0.1:8000/ before
+editing, then refresh that same canvas as visible changes land. Keep
+both local servers and the preview available.
+
+Show the finished highlights section and demonstrate:
+All → Agentic software development → Open source maintainers.
+
+Verify real API-failure handling and recovery by coordinating a brief
+shutdown of only this run's API server, checking the fallback and
+preserved keynote CTA, then restarting the API and checking retry.
+
+INDEPENDENT CLOUD TASK — API SMOKE TEST
+
+Build a standalone Node.js smoke-test client using only built-in
+modules. It should accept an API base URL and check /health,
+/api/highlights, an individual highlight, and an unknown highlight.
+Validate response status and shape, report useful errors, and exit
+nonzero on failure. Include focused tests and concise usage instructions.
+
+Add new files only; do not modify runtime code, existing tests, README,
+package manifests, sample data, demo tooling, or workflows. Work against
+the existing API on main; do not depend on /api/topics or either local
+feature branch. Do not use GitHub Actions for implementation or testing.
+
+After implementation and focused tests, run a five-minute verification
+soak inside the cloud sandbox:
+
+- Start the existing API in the sandbox on an OS-assigned ephemeral port.
+- Exercise the smoke checks every five seconds for at least 300 seconds
+  of elapsed time. Print progress at least every 30 seconds, including
+  elapsed time, checks completed, and failures.
+- Keep the session active and wait for the soak to finish before opening
+  its PR. Do not substitute a five-minute idle sleep for the checks.
+- Report the actual duration and results. If a failure or environment limit
+  prevents the full run, report that rather than claiming completion.
+- Stop only the temporary sandbox server afterward.
+
+The cloud session must not access the local checkouts, local preview,
+or local ports. Its implementation can finish independently of the
+local feature work.
+
+DELIVERY
+
+Open exactly three new PRs, one per session: one website feature PR,
+one API feature PR, and one independent API smoke-test PR. Target each
+repository's own main branch. Cross-link all three PRs and identify
+which ran locally versus in the cloud. Do not merge. The cloud task must
+not depend on GitHub Actions checks running or passing.
+
+Leave security-lab, existing and prepared demo PRs, and both main
+branches untouched. Do not add dark mode in this run.
+```
+
 ---
 
 ## Act 1c · Schedule an automation (optional, +3 min)
