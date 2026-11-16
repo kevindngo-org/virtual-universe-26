@@ -91,6 +91,20 @@
     details[open] summary { color: var(--ink); font-weight: 600; }
     details p { font-size: .93em; line-height: 1.6; margin: 0 0 14px; color: var(--muted); }
     code { font-family: "SFMono-Regular", Consolas, monospace; font-size: .9em; color: var(--ink); background: #f0f3f1; border: 1px solid #e3e9e5; border-radius: 3px; padding: 1px 3px; overflow-wrap: anywhere; }
+    .highlights { max-width: var(--content-width); margin: 0 auto 28px; padding: 32px 24px; border: 1px solid var(--line); }
+    .highlights .description { max-width: 46em; }
+    .topic-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 16px; }
+    .topic-filter { min-height: 36px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 24px; background: var(--field); color: var(--ink); cursor: pointer; font-size: 12px; }
+    .topic-filter:hover { border-color: var(--green); }
+    .topic-filter[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: #fff; }
+    .highlight-status { min-height: 1.5em; margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .highlight-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .highlight-card { height: 100%; padding: 20px; border: 1px solid var(--line); border-radius: 5px; background: var(--field); overflow-wrap: anywhere; }
+    .highlight-topic { margin: 0 0 12px; color: var(--muted); font-size: 11px; }
+    .highlight-card h3 { margin: 0 0 10px; font-size: 17px; line-height: 1.3; font-weight: 600; letter-spacing: -.02em; }
+    .highlight-summary, .highlight-try { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+    .highlight-try { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .highlight-try strong { color: var(--ink); }
     .keynote-cta { max-width: var(--content-width); margin-inline: auto; padding: 48px 24px; text-align: center; background: var(--field); border: 1px solid var(--line); border-top: 3px solid var(--green); }
     .keynote-cta .description { margin-inline: auto; }
     footer { max-width: var(--content-width); margin-inline: auto; padding: 20px 26px; display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; font-size: 12px; line-height: 1.5; color: var(--muted); }
@@ -112,6 +126,8 @@
       .screen { font-size: 11px; height: 260px; }
       .copilot-intro .guides { margin: 20px 0 0; }
       .copilot-intro .description { font-size: 15px; }
+      .highlight-grid { grid-template-columns: 1fr; }
+      .highlights { padding: 28px 24px; border-inline: 0; }
       .conversation { max-width: 480px; gap: 16px; }
       footer { padding: 18px 20px; border-top: 0; }
     }
@@ -203,6 +219,16 @@
           </div>
         </section>
       </div>
+      <section class="highlights" id="keynote-highlights" aria-labelledby="highlights-heading" data-api-base="http://localhost:3001">
+        <p class="eyebrow">FROM THE KEYNOTE</p>
+        <h2 id="highlights-heading">Keynote highlights</h2>
+        <p class="description">Browse sample keynote notes by topic, then try something yourself.</p>
+        <div class="topic-filters" id="topic-filters" role="group" aria-label="Filter highlights by topic"></div>
+        <p class="highlight-status" id="highlight-status" role="status">Loading keynote highlights...</p>
+        <button class="replay" id="highlight-retry" type="button" hidden>Retry highlights</button>
+        <ul class="highlight-grid" id="highlight-list" aria-label="Keynote highlights" aria-busy="true"></ul>
+        <noscript><p class="description">Enable JavaScript to load highlights, or explore the keynote recap below.</p></noscript>
+      </section>
       <section class="keynote-cta" aria-labelledby="keynote-heading">
         <h2 id="keynote-heading">Catch up on the keynote highlights</h2>
         <p class="description">Explore the biggest announcements from GitHub Universe and see what's next.</p>
@@ -214,6 +240,116 @@
       <p>Need the app? <a href=" https://github.com/features/ai/github-app?utm_source=virtual-universe-26-insider-resources-cta-top-app-download&utm_medium=web&utm_campaign=universe-2026">Download GitHub Copilot</a></p>
     </footer>
   </div>
+  <script id="keynote-highlights-script">
+    (() => {
+      const section = document.getElementById('keynote-highlights');
+      const filters = document.getElementById('topic-filters');
+      const status = document.getElementById('highlight-status');
+      const list = document.getElementById('highlight-list');
+      const retry = document.getElementById('highlight-retry');
+      let selectedTopic = '';
+      let requestNumber = 0;
+      let controller;
+
+      function element(tag, className, text) {
+        const node = document.createElement(tag);
+        node.className = className;
+        node.textContent = text;
+        return node;
+      }
+
+      async function getJSON(path, signal) {
+        const base = (section.dataset.apiBase || 'http://localhost:3001').replace(/\/+$/, '');
+        const url = new URL(`${base}/${path}`);
+        if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Invalid API URL');
+        const response = await fetch(url, { signal });
+        if (!response.ok) throw new Error(`Highlights API returned ${response.status}`);
+        return response.json();
+      }
+
+      function renderTopics(topics) {
+        if (!Array.isArray(topics) || !topics.every(topic =>
+          typeof topic.name === 'string' && topic.name.trim() &&
+          typeof topic.slug === 'string' && Number.isInteger(topic.count) && topic.count >= 0
+        )) throw new Error('Invalid topics response');
+        const buttons = [{ name: 'All', value: '' }, ...topics.map(topic => ({ name: topic.name, value: topic.name }))];
+        filters.replaceChildren(...buttons.map(({ name, value }) => {
+          const button = element('button', 'topic-filter', name);
+          button.type = 'button';
+          button.setAttribute('aria-controls', 'highlight-list');
+          button.setAttribute('aria-pressed', String(value === selectedTopic));
+          button.addEventListener('click', () => {
+            selectedTopic = value;
+            [...filters.children].forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+            loadHighlights();
+          });
+          return button;
+        }));
+      }
+
+      function renderHighlights(data) {
+        if (typeof data.event !== 'string' || !Array.isArray(data.highlights) ||
+          data.count !== data.highlights.length || !data.highlights.every(item =>
+            ['id', 'topic', 'title', 'summary', 'tryIt'].every(key => typeof item[key] === 'string')
+          )) throw new Error('Invalid highlights response');
+        list.replaceChildren(...data.highlights.map(item => {
+          const card = document.createElement('li');
+          const article = element('article', 'highlight-card', '');
+          const tryIt = element('p', 'highlight-try', '');
+          const label = element('strong', '', 'Try it: ');
+          tryIt.append(label, document.createTextNode(item.tryIt));
+          article.append(
+            element('p', 'highlight-topic', item.topic),
+            element('h3', '', item.title),
+            element('p', 'highlight-summary', item.summary),
+            tryIt
+          );
+          card.append(article);
+          return card;
+        }));
+        const count = `${data.count} ${data.count === 1 ? 'highlight' : 'highlights'}`;
+        status.textContent = `${count} for ${selectedTopic || 'All topics'}.${data.count === 0 ? ' Try another topic.' : ''}`;
+      }
+
+      async function loadHighlights(refreshTopics = false) {
+        const currentRequest = ++requestNumber;
+        controller?.abort();
+        controller = new AbortController();
+        const requestController = controller;
+        const { signal } = requestController;
+        const timeout = setTimeout(() => requestController.abort(), 8000);
+        const restoreFocus = document.activeElement === retry;
+        status.textContent = 'Loading keynote highlights...';
+        list.setAttribute('aria-busy', 'true');
+        list.replaceChildren();
+        retry.hidden = true;
+        try {
+          const query = selectedTopic ? `?topic=${encodeURIComponent(selectedTopic)}` : '';
+          const [data, topics] = await Promise.all([
+            getJSON(`api/highlights${query}`, signal),
+            refreshTopics ? getJSON('api/topics', signal) : Promise.resolve(null)
+          ]);
+          if (currentRequest !== requestNumber) return;
+          if (refreshTopics) renderTopics(topics.topics);
+          renderHighlights(data);
+          if (restoreFocus) {
+            [...filters.children].find(button => button.getAttribute('aria-pressed') === 'true')?.focus();
+          }
+        } catch (error) {
+          if (currentRequest !== requestNumber) return;
+          console.error('Unable to load keynote highlights:', error);
+          status.textContent = 'Keynote highlights are unavailable. Retry, or explore the keynote recap below.';
+          retry.hidden = false;
+        } finally {
+          clearTimeout(timeout);
+          if (currentRequest === requestNumber) list.setAttribute('aria-busy', 'false');
+        }
+      }
+
+      retry.addEventListener('click', () => loadHighlights(true));
+      loadHighlights(true);
+    })();
+  </script>
   <script>
     const screen = document.getElementById('terminal-screen');
     const terminalTitle = document.getElementById('terminal-title');
